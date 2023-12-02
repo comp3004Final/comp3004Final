@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/AEDSteps/Step1.png</file>
+        <file>res/AEDSteps/Step2.png</file>
+        <file>res/AEDSteps/Step3.png</file>
+        <file>res/AEDSteps/Step4.png</file>
+        <file>res/AEDSteps/Step5.png</file>
+        <file>res/Buttons/fail.svg</file>
+        <file>res/Buttons/pass.svg</file>
+        <file>res/Buttons/powerButton.svg</file>
+        <file>res/AEDSteps/ShockInd.png</file>
+    </qresource>
+</RCC>
