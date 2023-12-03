@@ -24,6 +24,8 @@ private:
     VoicePrompt *voicePromptWidget;
     void setStepBackgroundColor(QLabel *label, const QColor &color);
     void makeLabelRound(QLabel *label);
-    void initializeImage(QLabel *label, const QString &imagePath, int width, int height);
+    void initializeLabelImage(QLabel *label, const QString &imagePath, int width, int height);
+    void initializePowerButtonImage(QPushButton *button, const QString &imagePath, int iconWidth, int iconHeight);
+
 };
 #endif // MAINWINDOW_H
