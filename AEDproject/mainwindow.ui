@@ -6,29 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1174</width>
-    <height>699</height>
+    <width>1577</width>
+    <height>724</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>750</x>
-      <y>80</y>
-      <width>401</width>
-      <height>561</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="aedFrame">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>-10</y>
+      <y>10</y>
       <width>701</width>
       <height>661</height>
      </rect>
@@ -53,7 +43,7 @@
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>210</y>
+       <y>200</y>
        <width>150</width>
        <height>120</height>
       </rect>
@@ -78,7 +68,7 @@
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>190</y>
+       <y>180</y>
        <width>261</width>
        <height>161</height>
       </rect>
@@ -88,7 +78,7 @@
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>40</y>
+       <y>30</y>
        <width>150</width>
        <height>120</height>
       </rect>
@@ -113,7 +103,7 @@
      <property name="geometry">
       <rect>
        <x>520</x>
-       <y>210</y>
+       <y>200</y>
        <width>150</width>
        <height>120</height>
       </rect>
@@ -138,7 +128,7 @@
      <property name="geometry">
       <rect>
        <x>420</x>
-       <y>440</y>
+       <y>430</y>
        <width>150</width>
        <height>120</height>
       </rect>
@@ -163,7 +153,7 @@
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>410</y>
+       <y>400</y>
        <width>211</width>
        <height>161</height>
       </rect>
@@ -201,7 +191,7 @@
      <property name="geometry">
       <rect>
        <x>310</x>
-       <y>380</y>
+       <y>370</y>
        <width>80</width>
        <height>80</height>
       </rect>
@@ -223,13 +213,122 @@
      </property>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="promptFrame">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>10</y>
+      <width>351</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Quicksand</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Audio to text AED prompt</string>
+    </property>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>291</width>
+       <height>611</height>
+      </rect>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="electrodeFrame">
+    <property name="geometry">
+     <rect>
+      <x>1110</x>
+      <y>20</y>
+      <width>371</width>
+      <height>651</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Quicksand</family>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Electrodes placement</string>
+    </property>
+    <widget class="QPushButton" name="electrode1">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>200</y>
+       <width>100</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Electrode 1</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="electrode2">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>200</y>
+       <width>100</width>
+       <height>300</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>300</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Electrode 2</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="electrode3">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>400</y>
+       <width>100</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Electrode 3</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1174</width>
+     <width>1577</width>
      <height>22</height>
     </rect>
    </property>
