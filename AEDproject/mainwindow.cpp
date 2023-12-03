@@ -1,3 +1,4 @@
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QIcon>
@@ -7,6 +8,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
+    this->setWindowTitle("AED Plus");
 
     ui->powerButton->setIcon(QIcon(":/res/Buttons/powerButton.svg"));
     ui->powerButton->setIconSize(QSize(50,50));
@@ -27,8 +29,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     ui->step5->setPixmap(step5Img.scaled(200,150,Qt::KeepAspectRatio));
 
     QPixmap shockIndImg(":/res/AEDSteps/ShockInd.png");
-    ui->shockInd->setPixmap(shockIndImg.scaled(80,80,Qt::KeepAspectRatio));
+    ui->shockInd->setPixmap(shockIndImg.scaled(78,78,Qt::KeepAspectRatio));
+    makeLabelRound(ui->shockInd);
+    ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
+    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
+
+    setStepBackgroundColor(ui->step1, Qt::yellow);
+
+    setStepBackgroundColor(ui->shockInd, Qt::red);
+
+}
+
+void MainWindow::makeLabelRound(QLabel *label) {
+    // Set a circular shape for the QLabel using style sheets
+    label->setStyleSheet("QLabel { border-radius: 40px; }");
+}
+
+void MainWindow::setStepBackgroundColor(QLabel *label, const QColor &color) {
+    QString styleSheet = QString("background-color: %1;").arg(color.name());
+    label->setStyleSheet(styleSheet);
 }
 
 MainWindow::~MainWindow() {

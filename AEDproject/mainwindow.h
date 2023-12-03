@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,5 +18,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    void setStepBackgroundColor(QLabel *label, const QColor &color);
+    void makeLabelRound(QLabel *label);
 };
 #endif // MAINWINDOW_H
