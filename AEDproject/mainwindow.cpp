@@ -13,32 +13,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     ui->powerButton->setIcon(QIcon(":/res/Buttons/powerButton.svg"));
     ui->powerButton->setIconSize(QSize(50,50));
 
-    QPixmap step1Img(":/res/AEDSteps/Step1.png");
-    ui->step1->setPixmap(step1Img.scaled(150,150,Qt::KeepAspectRatio));
-
-    QPixmap step2Img(":/res/AEDSteps/Step2.png");
-    ui->step2->setPixmap(step2Img.scaled(150,150,Qt::KeepAspectRatio));
-
-    QPixmap step3Img(":/res/AEDSteps/Step3.png");
-    ui->step3->setPixmap(step3Img.scaled(150,150,Qt::KeepAspectRatio));
-
-    QPixmap step4Img(":/res/AEDSteps/Step4.png");
-    ui->step4->setPixmap(step4Img.scaled(150,150,Qt::KeepAspectRatio));
-
-    QPixmap step5Img(":/res/AEDSteps/Step5.png");
-    ui->step5->setPixmap(step5Img.scaled(200,150,Qt::KeepAspectRatio));
-
-    QPixmap shockIndImg(":/res/AEDSteps/ShockInd.png");
-    ui->shockInd->setPixmap(shockIndImg.scaled(78,78,Qt::KeepAspectRatio));
+    // Initialize images
+    initializeImage(ui->step1, ":/res/AEDSteps/Step1.png", 150, 150);
+    initializeImage(ui->step2, ":/res/AEDSteps/Step2.png", 150, 150);
+    initializeImage(ui->step3, ":/res/AEDSteps/Step3.png", 150, 150);
+    initializeImage(ui->step4, ":/res/AEDSteps/Step4.png", 150, 150);
+    initializeImage(ui->step5, ":/res/AEDSteps/Step5.png", 200, 150);
+    initializeImage(ui->shockInd, ":/res/AEDSteps/ShockInd.png", 78, 78);
     makeLabelRound(ui->shockInd);
-    ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
+    ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
+    ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
     ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
     setStepBackgroundColor(ui->step1, Qt::yellow);
 
     setStepBackgroundColor(ui->shockInd, Qt::red);
 
+
+    //------- Electrodes ---------
+    // Create an instance of Electrodes as a member variable
+    electrodesWidget = new Electrodes(ui->electrodeFrame);
+    setStepBackgroundColor(ui->shockInd, Qt::red);
+
+
+    //------- Electrodes ---------
+    // Create an instance of Electrodes as a member variable
+    electrodesWidget = new Electrodes(ui->electrodeFrame);
+
+    // Create an instance of the VoicePrompt as a member variable
+    voicePromptWidget = new VoicePrompt(ui->promptFrame);
 }
 
 void MainWindow::makeLabelRound(QLabel *label) {
@@ -49,6 +53,11 @@ void MainWindow::makeLabelRound(QLabel *label) {
 void MainWindow::setStepBackgroundColor(QLabel *label, const QColor &color) {
     QString styleSheet = QString("background-color: %1;").arg(color.name());
     label->setStyleSheet(styleSheet);
+}
+
+void MainWindow::initializeImage(QLabel *label, const QString &imagePath, int width, int height) {
+    QPixmap img(imagePath);
+    label->setPixmap(img.scaled(width, height, Qt::KeepAspectRatio));
 }
 
 MainWindow::~MainWindow() {

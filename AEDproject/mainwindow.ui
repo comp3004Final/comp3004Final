@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1577</width>
-    <height>724</height>
+    <width>1490</width>
+    <height>717</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="aedFrame">
+   <widget class="QFrame" name="aedFrame">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -22,9 +22,6 @@
       <width>701</width>
       <height>661</height>
      </rect>
-    </property>
-    <property name="title">
-     <string/>
     </property>
     <widget class="QPushButton" name="powerButton">
      <property name="geometry">
@@ -213,7 +210,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="promptFrame">
+   <widget class="QFrame" name="promptFrame">
     <property name="geometry">
      <rect>
       <x>740</x>
@@ -230,9 +227,6 @@
       <bold>true</bold>
      </font>
     </property>
-    <property name="title">
-     <string>Audio to text AED prompt</string>
-    </property>
     <widget class="QTextBrowser" name="textBrowser">
      <property name="geometry">
       <rect>
@@ -243,14 +237,27 @@
       </rect>
      </property>
     </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>10</y>
+       <width>291</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>AED Voice to Text Prompt</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QGroupBox" name="electrodeFrame">
+   <widget class="QFrame" name="electrodeFrame">
     <property name="geometry">
      <rect>
-      <x>1110</x>
-      <y>20</y>
-      <width>371</width>
-      <height>651</height>
+      <x>1120</x>
+      <y>10</y>
+      <width>361</width>
+      <height>661</height>
      </rect>
     </property>
     <property name="font">
@@ -260,9 +267,6 @@
       <weight>75</weight>
       <bold>true</bold>
      </font>
-    </property>
-    <property name="title">
-     <string>Electrodes placement</string>
     </property>
     <widget class="QPushButton" name="electrode1">
      <property name="geometry">
@@ -280,7 +284,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Electrode 1</string>
+      <string>E1</string>
      </property>
     </widget>
     <widget class="QPushButton" name="electrode2">
@@ -299,7 +303,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Electrode 2</string>
+      <string>E2</string>
      </property>
     </widget>
     <widget class="QPushButton" name="electrode3">
@@ -318,7 +322,20 @@
       </size>
      </property>
      <property name="text">
-      <string>Electrode 3</string>
+      <string>E3</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>191</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Electrode Placement</string>
      </property>
     </widget>
    </widget>
@@ -328,7 +345,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1577</width>
+     <width>1490</width>
      <height>22</height>
     </rect>
    </property>
