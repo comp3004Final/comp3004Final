@@ -54,11 +54,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     // Create an instance of Electrodes as a member variable
     electrodesWidget = new Electrodes(ui->electrodeFrame);
 
+    clickedElectrodes.clear();
+    connect(ui->electrode1, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+    connect(ui->electrode2, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+    connect(ui->electrode3, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+
     // Create an instance of the VoicePrompt as a member variable
     voicePromptWidget = new VoicePrompt(ui->promptFrame);
 
     // Connect the button's clicked signal to the powerButtonClicked slot
     connect(ui->powerButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
+
 
 }
 
@@ -95,8 +101,9 @@ void MainWindow::selfTestComplete() {
         ui->statInd->setPixmap(statIndImage.scaled(80, 80, Qt::KeepAspectRatio));
         ui->voiceOutput->setText("Automated Defibrillator OK");
 
-        // Move to the next step after the self-test is complete
-        nextStep();
+        // Move to the next step after the current step's duration (e.g., 5 seconds)
+        QTimer::singleShot(5000, this, &MainWindow::nextStep);
+//        nextStep();
     } else {
         // Display a message in the QTextBrowser after the 5-second delay
         ui->LCDScreen->append("Automated Defibrillator FAILED");
@@ -153,30 +160,57 @@ void MainWindow::toggleFlash(QLabel *label) {
 void MainWindow::performAEDStep() {
     switch (step) {
     case 1:
-            // Step 1: Display "Stay calm." on voiceOutput for 10 seconds
-            ui->voiceOutput->append("Stay calm");
-            ui->voiceOutput->append("Check responsiveness");
-            toggleFlash(ui->step1);  // Toggle the flash for step 1
+        // Step 1: Display "Stay calm." on voiceOutput for 10 seconds
+        ui->voiceOutput->append("Stay calm");
+        ui->voiceOutput->append("Check responsiveness");
 
-            // Start the flashing timer for 10 seconds
-            flashTimer->start(10000);
+        // Start the flash for step 1
+        startFlash(ui->step1);
 
-            // Move to the next step after the current step's duration (e.g., 10 seconds)
-            QTimer::singleShot(10000, this, &MainWindow::nextStep);
-            break;
+        // Wait for 10 seconds before moving to the next step
+        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+        break;
 
-        case 2:
-            // Step 2: Call for help for 10 seconds
-            ui->voiceOutput->append("Call for help");
-            stopFlash(ui->step1);  // Stop the flash for step 1
-            startFlash(ui->step2);  // Start the flash for step 2
-            break;
+    case 2:
+        // Step 2: Call for help for 10 seconds
+        ui->voiceOutput->append("Call for help");
 
-        // ... (update for other steps)
+        // Stop the flash for step 1 and start the flash for step 2
+        stopFlash(ui->step1);
+        startFlash(ui->step2);
 
-        default:
+        // Wait for 10 seconds before moving to the next step
+        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+        break;
 
-            break;
+    case 3:
+        // Step 3: Attach pads on the victim's chest
+        ui->voiceOutput->append("Attach defib pads to patient's bare chest");
+
+        // Stop the flash for step 1 and start the flash for step 2
+        stopFlash(ui->step2);
+        startFlash(ui->step3);
+        if (clickedElectrodes.size() == 3) {
+                    // All electrodes are placed, move to the next step
+                    nextStep();
+        } else {
+                   // Not all electrodes are placed...
+               }
+        break;
+
+    case 4:
+        // Step 4: Don't touch the patient
+        ui->voiceOutput->append("Don't touch the patient");
+
+        // Stop the flash for step 1 and start the flash for step 2
+        stopFlash(ui->step3);
+        startFlash(ui->step4);
+        break;
+
+
+    default:
+
+        break;
     }
 }
 
@@ -205,22 +239,33 @@ void MainWindow::nextStep() {
     performAEDStep();
 }
 
-void MainWindow::stopCurrentStep() {
-    // Stop the flashing and move to the next step
-    stopFlash(ui->step1);
-    stopFlash(ui->step2);
-    // ... (stop other steps)
-
-    // Move to the next step after the current step's duration ( 10 seconds)
-    QTimer::singleShot(10000, this, &MainWindow::nextStep);
-}
-
 void MainWindow::previousStep() {
     // Decrement the step variable
     step--;
 
     // Perform actions based on the new step
     performAEDStep();
+}
+
+void MainWindow::stopCurrentStep() {
+    // Stop the flashing and move to the next step
+    stopFlash(ui->step1);
+    stopFlash(ui->step2);
+
+    // Move to the next step after the current step's duration (e.g., 10 seconds)
+    QTimer::singleShot(10000, this, &MainWindow::nextStep);
+}
+
+void MainWindow::electrodeClicked() {
+    QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
+    if (clickedButton && !clickedElectrodes.contains(clickedButton)) {
+        clickedElectrodes.insert(clickedButton);
+
+        if (clickedElectrodes.size() == 3) {
+            // Move to the next step
+            nextStep();
+        }
+    }
 }
 
 MainWindow::~MainWindow() {

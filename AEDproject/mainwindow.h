@@ -23,6 +23,9 @@ private:
     int statusIndicator;
     int step;
     int powerStatus;
+
+    QSet<QPushButton*> clickedElectrodes;
+
     QTimer *flashTimer;
     Ui::MainWindow *ui;
     Electrodes *electrodesWidget;
@@ -41,6 +44,8 @@ private:
 
     void initializeLabelImage(QLabel *label, const QString &imagePath, int width, int height);
     void initializePowerButtonImage(QPushButton *button, const QString &imagePath, int iconWidth, int iconHeight);
+
+    void electrodeClicked();
 
     void powerButtonClicked();
 
