@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1490</width>
-    <height>717</height>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,14 +20,14 @@
       <x>20</x>
       <y>10</y>
       <width>701</width>
-      <height>661</height>
+      <height>681</height>
      </rect>
     </property>
     <widget class="QPushButton" name="powerButton">
      <property name="geometry">
       <rect>
-       <x>620</x>
-       <y>580</y>
+       <x>600</x>
+       <y>600</y>
        <width>71</width>
        <height>71</height>
       </rect>
@@ -169,9 +169,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>570</y>
-       <width>101</width>
-       <height>81</height>
+       <y>580</y>
+       <width>131</width>
+       <height>101</height>
       </rect>
      </property>
      <property name="lineWidth">

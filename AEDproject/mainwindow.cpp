@@ -33,11 +33,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     initializeLabelImage(ui->step4, ":/res/AEDSteps/Step4.png", 150, 150);
     initializeLabelImage(ui->step5, ":/res/AEDSteps/Step5.png", 200, 150);
     initializeLabelImage(ui->shockInd, ":/res/AEDSteps/ShockInd.png", 78, 78);
+    initializeLabelImage(ui->statInd, ":/res/AEDSteps/statInd0.png", 135, 135);
 //    makeLabelRound(ui->shockInd);
 
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
-    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
+//    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
 
 //    setStepBackgroundColor(ui->shockInd, Qt::red);
@@ -94,8 +95,8 @@ void MainWindow::selfTestComplete() {
         // Display a message in the QTextBrowser after the 5-second delay
         ui->LCDScreen->append("Automated Defibrillator OK");
         // Update the statInd QLabel with the pass.svg image
-        QPixmap statIndImage(":/res/Buttons/pass.svg");
-        ui->statInd->setPixmap(statIndImage.scaled(80, 80, Qt::KeepAspectRatio));
+        QPixmap statIndImage(":/res/AEDSteps/statIndPass.png");
+        ui->statInd->setPixmap(statIndImage.scaled(135, 135, Qt::KeepAspectRatio));
         ui->voiceOutput->setText("Automated Defibrillator OK");
 
         // Move to the next step after the current step's duration (e.g., 5 seconds)
@@ -105,8 +106,8 @@ void MainWindow::selfTestComplete() {
         // Display a message in the QTextBrowser after the 5-second delay
         ui->LCDScreen->append("Automated Defibrillator FAILED");
         // Update the statInd QLabel with the pass.svg image
-        QPixmap statIndImage(":/res/Buttons/fail.svg");
-        ui->statInd->setPixmap(statIndImage.scaled(80, 80, Qt::KeepAspectRatio));
+        QPixmap statIndImage(":/res/AEDSteps/statIndFail.png");
+        ui->statInd->setPixmap(statIndImage.scaled(135, 135, Qt::KeepAspectRatio));
         ui->voiceOutput->setText("Automated Defibrillator FAILED");
     }
 }
@@ -125,9 +126,10 @@ void MainWindow::powerButtonClicked() {
 
 void MainWindow::startFlash(QLabel *label) {
     // Start the flashing timer for the given label
-    flashTimer->disconnect();  // Disconnect any previous connections
+    // Disconnect any previous connections
+    flashTimer->disconnect();
     connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
-    flashTimer->start(800);  // Adjust the interval (e.g., 800 ms) as needed
+    flashTimer->start(800);
 }
 
 void MainWindow::stopFlash(QLabel *label) {
@@ -191,7 +193,7 @@ void MainWindow::performAEDStep() {
                     // All electrodes are placed, move to the next step
                     nextStep();
         } else {
-
+                   // Not all electrodes are placed
                }
         break;
 
@@ -247,7 +249,6 @@ void MainWindow::stopCurrentStep() {
     // Stop the flashing and move to the next step
     stopFlash(ui->step1);
     stopFlash(ui->step2);
-    // ... (stop other steps)
 
     // Move to the next step after the current step's duration (10 seconds)
     QTimer::singleShot(10000, this, &MainWindow::nextStep);

@@ -9,5 +9,8 @@
         <file>res/Buttons/pass.svg</file>
         <file>res/Buttons/powerButton.svg</file>
         <file>res/AEDSteps/ShockInd.png</file>
+        <file>res/AEDSteps/statInd0.png</file>
+        <file>res/AEDSteps/statIndFail.png</file>
+        <file>res/AEDSteps/statIndPass.png</file>
     </qresource>
 </RCC>
