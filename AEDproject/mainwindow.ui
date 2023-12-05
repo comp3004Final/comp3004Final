@@ -227,7 +227,7 @@
       <bold>true</bold>
      </font>
     </property>
-    <widget class="QTextBrowser" name="textBrowser">
+    <widget class="QTextBrowser" name="voiceOutput">
      <property name="geometry">
       <rect>
        <x>30</x>

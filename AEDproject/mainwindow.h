@@ -1,10 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+
 #include <electrodes.h>
 #include <voiceprompt.h>
 
 #include <QMainWindow>
 #include <QLabel>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,14 +20,18 @@ public:
     ~MainWindow();
 
 private:
-    bool powerStatus;
+    int statusIndicator;
+    int step;
+    int powerStatus;
     Ui::MainWindow *ui;
     Electrodes *electrodesWidget;
     VoicePrompt *voicePromptWidget;
+
+    void runSelfTest();
+    void selfTestComplete();
     void setStepBackgroundColor(QLabel *label, const QColor &color);
-    void makeLabelRound(QLabel *label);
     void initializeLabelImage(QLabel *label, const QString &imagePath, int width, int height);
     void initializePowerButtonImage(QPushButton *button, const QString &imagePath, int iconWidth, int iconHeight);
-
+    void powerButtonClicked();
 };
-#endif // MAINWINDOW_H
+#endif
