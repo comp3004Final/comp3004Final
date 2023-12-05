@@ -40,10 +40,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
 
-
 //    setStepBackgroundColor(ui->shockInd, Qt::red);
-
-
     //------- Electrodes ---------
     // Create an instance of Electrodes as a member variable
     electrodesWidget = new Electrodes(ui->electrodeFrame);
@@ -194,7 +191,7 @@ void MainWindow::performAEDStep() {
                     // All electrodes are placed, move to the next step
                     nextStep();
         } else {
-                   // Not all electrodes are placed...
+
                }
         break;
 
@@ -206,7 +203,6 @@ void MainWindow::performAEDStep() {
         stopFlash(ui->step3);
         startFlash(ui->step4);
         break;
-
 
     default:
 
@@ -251,8 +247,9 @@ void MainWindow::stopCurrentStep() {
     // Stop the flashing and move to the next step
     stopFlash(ui->step1);
     stopFlash(ui->step2);
+    // ... (stop other steps)
 
-    // Move to the next step after the current step's duration (e.g., 10 seconds)
+    // Move to the next step after the current step's duration (10 seconds)
     QTimer::singleShot(10000, this, &MainWindow::nextStep);
 }
 
