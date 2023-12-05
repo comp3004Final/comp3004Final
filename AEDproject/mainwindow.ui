@@ -70,6 +70,11 @@
        <height>161</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+      </font>
+     </property>
     </widget>
     <widget class="QLabel" name="step2">
      <property name="geometry">
@@ -233,7 +238,7 @@
        <x>30</x>
        <y>40</y>
        <width>291</width>
-       <height>611</height>
+       <height>601</height>
       </rect>
      </property>
      <property name="font">
@@ -280,7 +285,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>200</y>
+       <y>70</y>
        <width>100</width>
        <height>100</height>
       </rect>
@@ -299,7 +304,7 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>200</y>
+       <y>70</y>
        <width>100</width>
        <height>300</height>
       </rect>
@@ -318,7 +323,7 @@
      <property name="geometry">
       <rect>
        <x>240</x>
-       <y>400</y>
+       <y>270</y>
        <width>100</width>
        <height>100</height>
       </rect>
@@ -344,6 +349,37 @@
      </property>
      <property name="text">
       <string>Electrode Placement</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="selfTestStatus">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>430</y>
+       <width>71</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+       <pointsize>12</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>430</y>
+       <width>201</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>AED selft test status</string>
      </property>
     </widget>
    </widget>

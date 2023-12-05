@@ -7,6 +7,8 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
+#include <QPushButton>
+#include <QComboBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,10 +21,17 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void updateStatusIndicator(int index);
+
 private:
     int statusIndicator;
     int step;
     int powerStatus;
+
+    //Restart mechanism
+    QTimer *powerButtonTimer;
+    int powerButtonPressDuration;
 
     QSet<QPushButton*> clickedElectrodes;
 
@@ -36,6 +45,12 @@ private:
     void stopFlash(QLabel *label);
     void stopCurrentStep();
     QLabel* getStepLabel(int step);
+
+    //restart
+    void powerButtonPressed();
+    void powerButtonReleased();
+    void checkPowerButtonPress();
+    void restartSystem();
 
     void runSelfTest();
     void selfTestComplete();

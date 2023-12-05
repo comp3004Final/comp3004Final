@@ -17,6 +17,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     statusIndicator = 1;
     step = 0;
 
+    //Make window darker
+    QPalette darkPalette;
+    darkPalette.setColor(QPalette::Window, QColor(150, 150, 150));  // Set the dark grey color
+    this->centralWidget()->setAutoFillBackground(true);
+    this->centralWidget()->setPalette(darkPalette);
+
     //Used for the flashing lights
     flashTimer = new QTimer(this);
     connect(flashTimer, &QTimer::timeout, this, [this]() { toggleFlash(ui->step1); });
@@ -25,6 +31,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
 
     //Initialize image on power button
     initializePowerButtonImage(ui->powerButton, ":/res/Buttons/powerButton.svg", 50, 50);
+
+    powerButtonTimer = new QTimer(this);
+    connect(powerButtonTimer, &QTimer::timeout, this, &MainWindow::checkPowerButtonPress);
+
+    connect(ui->powerButton, &QPushButton::pressed, this, &MainWindow::powerButtonPressed);
+    connect(ui->powerButton, &QPushButton::released, this, &MainWindow::powerButtonReleased);
+
+
 
     // Initialize images on labels
     initializeLabelImage(ui->step1, ":/res/AEDSteps/Step1.png", 150, 150);
@@ -39,6 +53,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
 //    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
+
+
+    // Create the selfTestStatus QComboBox
+    ui->selfTestStatus->addItem("PASS");
+    ui->selfTestStatus->addItem("FAIL");
+
+    // Connect the currentIndexChanged signal to the updateStatusIndicator slot
+    connect(ui->selfTestStatus, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &MainWindow::updateStatusIndicator);
 
 
 //    setStepBackgroundColor(ui->shockInd, Qt::red);
@@ -66,6 +89,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
 
 }
 
+void MainWindow::updateStatusIndicator(int index) {
+    // Check the selected value and update statusIndicator
+    if (index == 0) {
+        // "Pass" is selected
+        statusIndicator = 1;
+    } else if (index == 1) {
+        // "Fail" is selected
+        statusIndicator = 0;
+    }
+}
+
 void MainWindow::setStepBackgroundColor(QLabel *label, const QColor &color) {
     QString styleSheet = QString("background-color: %1;").arg(color.name());
     label->setStyleSheet(styleSheet);
@@ -80,6 +114,35 @@ void MainWindow::initializePowerButtonImage(QPushButton *button, const QString &
     QPixmap buttonImg(imagePath);
     button->setIcon(QIcon(buttonImg));
     button->setIconSize(QSize(iconWidth, iconHeight));
+}
+
+//Restart functions
+void MainWindow::powerButtonPressed() {
+    powerButtonPressDuration = 0;
+    powerButtonTimer->start(1000);  // Timer fires every 1000 ms (1 second)
+}
+
+void MainWindow::powerButtonReleased() {
+    powerButtonTimer->stop();
+}
+
+void MainWindow::checkPowerButtonPress() {
+    powerButtonPressDuration++;
+
+    if (powerButtonPressDuration == 5) {  // 5 seconds
+        if (statusIndicator == 0) {
+            // Status is 0 (failed self-test), initiate restart
+            restartSystem();
+        }
+    }
+}
+
+void MainWindow::restartSystem() {
+    //Clear all screens
+    ui->LCDScreen->clear();
+    ui->voiceOutput->clear();
+    initializeLabelImage(ui->statInd, ":/res/AEDSteps/statInd0.png", 135, 135);
+    runSelfTest();
 }
 
 void MainWindow::runSelfTest() {
@@ -129,7 +192,7 @@ void MainWindow::startFlash(QLabel *label) {
     // Disconnect any previous connections
     flashTimer->disconnect();
     connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
-    flashTimer->start(800);
+    flashTimer->start(800);  // Adjust the interval (e.g., 800 ms) as needed
 }
 
 void MainWindow::stopFlash(QLabel *label) {
@@ -147,7 +210,7 @@ void MainWindow::toggleFlash(QLabel *label) {
     // Toggle the background color between yellow and the original color
     QPalette palette = label->palette();
     if (palette.color(QPalette::Window) == Qt::yellow) {
-        palette.setColor(QPalette::Window, Qt::white);
+        palette.setColor(QPalette::Window, QColor(150, 150, 150));
     } else {
         palette.setColor(QPalette::Window, Qt::yellow);
     }
@@ -225,7 +288,7 @@ QLabel *MainWindow::getStepLabel(int step) {
         case 5:
             return ui->step5;
         default:
-            return nullptr;
+            return nullptr; // Handle unexpected step value
     }
 }
 
