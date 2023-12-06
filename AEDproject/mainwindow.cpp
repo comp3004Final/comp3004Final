@@ -100,9 +100,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     // Connect the button's clicked signal to the powerButtonClicked slot
     connect(ui->powerButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
+    connect(ui->hRhythm, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::updateGraph);
 
 }
 
+void MainWindow::updateGraph(int index) {
+    QGraphicsScene* scene = new QGraphicsScene(this);
+
+    // Select the appropriate points based on the heart rhythm
+    const QVector<QPointF>& selectedPoints = (index == 0) ? normalPoints :
+                                            (index == 1) ? vfPoints :
+                                            (index == 2) ? vtPoints :
+                                            QVector<QPointF>(); // Default to an empty set
+
+    // Assuming "graph" is the QGraphicsView
+    QGraphicsView* graphView = ui->graph;
+    graphView->setScene(scene);
+
+    // Connect the points with a line
+    for (int i = 0; i < selectedPoints.size() - 1; ++i) {
+        const QPointF& startPoint = selectedPoints[i];
+        const QPointF& endPoint = selectedPoints[i + 1];
+        scene->addLine(startPoint.x(), startPoint.y(), endPoint.x(), endPoint.y());
+    }
+}
 void MainWindow::updateElapsedTime() {
     qint64 elapsedMilliseconds = AEDTimer.elapsed();
     qint64 seconds = elapsedMilliseconds / 1000;
@@ -201,7 +222,7 @@ void MainWindow::selfTestComplete() {
         ui->statInd->setPixmap(statIndImage.scaled(135, 135, Qt::KeepAspectRatio));
         ui->voiceOutput->setText("Automated Defibrillator OK");
 
-        // Move to the next step after the current step's duration (5 seconds)
+        // Move to the next step after the current step's duration (e.g., 5 seconds)
         QTimer::singleShot(5000, this, &MainWindow::nextStep);
 //        nextStep();
     } else {
@@ -277,8 +298,10 @@ void MainWindow::performAEDStep() {
         // Start the flash for step 1
         startFlash(ui->step1);
 
-        // Wait for 10 seconds before moving to the next step
-        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+//        // Wait for 10 seconds before moving to the next step
+//        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+        //Test
+        QTimer::singleShot(1000, this, &MainWindow::nextStep);
         break;
 
     case 2:
@@ -289,8 +312,11 @@ void MainWindow::performAEDStep() {
         stopFlash(ui->step1);
         startFlash(ui->step2);
 
-        // Wait for 10 seconds before moving to the next step
-        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+//        // Wait for 10 seconds before moving to the next step
+//        QTimer::singleShot(10000, this, &MainWindow::nextStep);
+
+        //Test
+        QTimer::singleShot(1000, this, &MainWindow::nextStep);
         break;
 
     case 3:
@@ -324,12 +350,16 @@ void MainWindow::performAEDStep() {
             QString selectedRhythm = ui->hRhythm->currentText();
             ui->heartRhythm->setText(selectedRhythm);
 
+            // Update the graph based on the selected rhythm
+            updateGraph(ui->hRhythm->currentIndex());
+
             ui->graph->setVisible(true);
+
         });
         break;
     }
     default:
-
+        // Handle unexpected step value
         break;
     }
 }
@@ -371,6 +401,7 @@ void MainWindow::stopCurrentStep() {
     // Stop the flashing and move to the next step
     stopFlash(ui->step1);
     stopFlash(ui->step2);
+    // ... (stop other steps)
 
     // Move to the next step after the current step's duration (10 seconds)
     QTimer::singleShot(10000, this, &MainWindow::nextStep);
