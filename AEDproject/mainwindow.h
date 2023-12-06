@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QComboBox>
+#include <QElapsedTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,12 +29,17 @@ private:
     int statusIndicator;
     int step;
     int powerStatus;
+    int shockCount;
 
     //Restart mechanism
     QTimer *powerButtonTimer;
     int powerButtonPressDuration;
 
     QSet<QPushButton*> clickedElectrodes;
+
+    QElapsedTimer AEDTimer;
+    QTimer *updateTimer;
+    void updateElapsedTime();
 
     QTimer *flashTimer;
     Ui::MainWindow *ui;

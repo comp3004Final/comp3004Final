@@ -65,9 +65,9 @@
      <property name="geometry">
       <rect>
        <x>220</x>
-       <y>180</y>
+       <y>200</y>
        <width>261</width>
-       <height>161</height>
+       <height>131</height>
       </rect>
      </property>
      <property name="font">
@@ -212,6 +212,76 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="shocksCounter">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>170</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+      </font>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="timeElapsed">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>170</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+      </font>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="heartRhythm">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>330</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+      </font>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="battery">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>330</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+      </font>
+     </property>
+    </widget>
+    <widget class="QGraphicsView" name="graph">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>200</y>
+       <width>261</width>
+       <height>131</height>
+      </rect>
      </property>
     </widget>
    </widget>

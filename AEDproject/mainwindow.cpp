@@ -16,6 +16,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     // 1 = Pass, 0 = Fail
     statusIndicator = 1;
     step = 0;
+    shockCount = 0;
+
+    // Create a timer for updating the elapsed time in the QTextBrowser
+    updateTimer = new QTimer(this);
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
+
+    // Add shockcounter
+    ui->shocksCounter->setText("SHOCKS: " + QString::number(shockCount));
+
+    // Turn graph off since it lays on top of LCD
+    ui->graph->setVisible(false);
 
     //Make window darker
     QPalette darkPalette;
@@ -87,6 +98,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     connect(ui->powerButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
 
+}
+
+void MainWindow::updateElapsedTime() {
+    qint64 elapsedMilliseconds = AEDTimer.elapsed();
+    qint64 seconds = elapsedMilliseconds / 1000;
+    qint64 minutes = seconds / 60;
+
+    // Format the elapsed time as a string
+    QString elapsedTimeString = QString("%1:%2")
+                                   .arg(minutes, 2, 10, QLatin1Char('0'))
+                                   .arg(seconds % 60, 2, 10, QLatin1Char('0'));
+
+    // Set the formatted elapsed time in the QTextBrowser
+    ui->timeElapsed->clear();  // Clear existing text
+    QTextCursor cursor = ui->timeElapsed->textCursor();
+
+    // Align the text to the right
+    QTextBlockFormat blockFormat = cursor.blockFormat();
+    blockFormat.setAlignment(Qt::AlignRight);
+    cursor.setBlockFormat(blockFormat);
+
+    // Move to the end and insert the text
+    cursor.movePosition(QTextCursor::End);
+    cursor.insertText(elapsedTimeString);
+    ui->timeElapsed->setTextCursor(cursor);
 }
 
 void MainWindow::updateStatusIndicator(int index) {
@@ -180,6 +216,15 @@ void MainWindow::powerButtonClicked() {
         ui->powerButton->setStyleSheet("background-color: green");
         ui->LCDScreen->setText("AED is powering on...");
         powerStatus = 1;
+
+        // Restart if the device was rebooted.
+        AEDTimer.restart();
+        // Initialize the device timer
+        AEDTimer.start();
+
+        // Update the timer every second
+        updateTimer->start(1000);  // Update every second
+
         // Add a 3-second delay before calling the runSelfTest function
         QTimer::singleShot(3000, this, &MainWindow::runSelfTest);
     } else {
@@ -189,7 +234,7 @@ void MainWindow::powerButtonClicked() {
 
 void MainWindow::startFlash(QLabel *label) {
     // Start the flashing timer for the given label
-    // Disconnect any previous connections
+     // Disconnect any previous connections
     flashTimer->disconnect();
     connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
     flashTimer->start(800);  // Adjust the interval (e.g., 800 ms) as needed
@@ -269,8 +314,11 @@ void MainWindow::performAEDStep() {
         startFlash(ui->step4);
         break;
 
-    default:
 
+    // ... (update for other steps)
+
+    default:
+        // Handle unexpected step value
         break;
     }
 }
@@ -288,7 +336,7 @@ QLabel *MainWindow::getStepLabel(int step) {
         case 5:
             return ui->step5;
         default:
-            return nullptr; // Handle unexpected step value
+            return nullptr;
     }
 }
 
@@ -332,4 +380,5 @@ void MainWindow::electrodeClicked() {
 MainWindow::~MainWindow() {
     delete ui;
     delete flashTimer;
+    delete powerButtonTimer;
 }
