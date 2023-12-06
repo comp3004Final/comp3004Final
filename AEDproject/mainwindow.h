@@ -13,6 +13,8 @@
 #include <QPointF>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <cmath>
+#include <QRandomGenerator>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,6 +31,8 @@ private slots:
     void updateStatusIndicator(int index);
 
 private:
+    // Since normal rhythm is so particular, we were not able to come up with a function that would consistently draw this type of rhythm. Instead we manually traced the heartbeat.
+    // We chose not do add randomness to the points themselves, because again sometimes we endedup with unconventional "normal" rhythms
     const QVector<QPointF> normalPoints = {
         QPointF(0, 100),
         QPointF(24, 100),
@@ -62,55 +66,28 @@ private:
         QPointF(244, 100),
     };
 
-    const QVector<QPointF> vfPoints = {
-        QPointF(0, 100),
-        QPointF(6, 81),
-        QPointF(12, 92),
-        QPointF(18, 63),
-        QPointF(24, 105),
-        QPointF(30, 76),
-        QPointF(36, 96),
-        QPointF(42, 65),
-        QPointF(48, 104),
-        QPointF(54, 73),
+    // Pseudorandom sinwave funcition that will generate the VF rhythm, by adding some extra points which will make the function less smooth, resulting in a more accurate VT rhythm.
+    const QVector<QPointF> vfPoints = [] {
+        QVector<QPointF> points;
+        QRandomGenerator random(QRandomGenerator::securelySeeded());
+        for (int x = 0; x <= 240; x += 5) {
+            double y = 100 + 15 * std::sin(0.8 * x)  + random.bounded(-4, 6);
+            points.append(QPointF(x, y));
+        }
+        return points;
+    }();
 
-        QPointF(60, 100),
-        QPointF(66, 80),
-        QPointF(72, 89),
-        QPointF(78, 58),
-        QPointF(84, 97),
-        QPointF(90, 66),
-        QPointF(96, 88),
-        QPointF(102, 60),
-        QPointF(108, 100),
-        QPointF(114, 71),
+    //Pseudo random sinwave function that will generate the VT rhythm.
+    const QVector<QPointF> vtPoints = [] {
+        QVector<QPointF> points;
+        QRandomGenerator random(QRandomGenerator::securelySeeded());
 
-        QPointF(120, 103),
-        QPointF(126, 85),
-        QPointF(132, 98),
-        QPointF(138, 65),
-        QPointF(144, 108),
-        QPointF(150, 74),
-        QPointF(156, 93),
-        QPointF(162, 62),
-        QPointF(168, 98),
-        QPointF(174, 66),
-
-        QPointF(180, 96),
-        QPointF(186, 78),
-        QPointF(192, 89),
-        QPointF(198, 60),
-        QPointF(204, 100),
-        QPointF(210, 72),
-        QPointF(216, 93),
-        QPointF(222, 60),
-        QPointF(228, 102),
-        QPointF(234, 63)
-    };
-
-    const QVector<QPointF> vtPoints = {
-    //Implement this later alligator
-    };
+        for (double x = 0; x <= 240; x += 1) {
+            double y = 100 + random.bounded(20, 25) * std::sin(0.2 * x);
+            points.append(QPointF(x, y));
+        }
+        return points;
+    }();
 
     int statusIndicator;
     int step;

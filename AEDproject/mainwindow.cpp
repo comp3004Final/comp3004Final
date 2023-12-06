@@ -261,7 +261,7 @@ void MainWindow::startFlash(QLabel *label) {
     // Disconnect any previous connections
     flashTimer->disconnect();
     connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
-    flashTimer->start(800);  // Adjust the interval (e.g., 800 ms) as needed
+    flashTimer->start(800);  // Adjust the interval (800 ms) as needed
 }
 
 void MainWindow::stopFlash(QLabel *label) {
@@ -330,7 +330,7 @@ void MainWindow::performAEDStep() {
                     // All electrodes are placed, move to the next step
                     nextStep();
         } else {
-                   // Not all electrodes are placed
+                   // Not all electrodes are placed, you can handle this case accordingly
                }
         break;
 
@@ -377,7 +377,7 @@ QLabel *MainWindow::getStepLabel(int step) {
         case 5:
             return ui->step5;
         default:
-            return nullptr;
+            return nullptr; // Handle unexpected step value
     }
 }
 
