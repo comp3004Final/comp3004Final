@@ -1,5 +1,7 @@
 ### Hi there 👋
 
+This is our final project code for COMP3004. AED simulator using C++ and QT Creator
+
 <!--
 **comp3004Final/comp3004Final** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
