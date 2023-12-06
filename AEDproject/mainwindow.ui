@@ -425,9 +425,9 @@
      <property name="geometry">
       <rect>
        <x>270</x>
-       <y>430</y>
+       <y>420</y>
        <width>71</width>
-       <height>25</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
@@ -442,14 +442,45 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>430</y>
+       <x>30</x>
+       <y>420</y>
        <width>201</width>
-       <height>17</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
       <string>AED selft test status</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="hRhythm">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>480</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Source Code Pro</family>
+       <pointsize>12</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>480</y>
+       <width>161</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Heart Rhythm</string>
      </property>
     </widget>
    </widget>

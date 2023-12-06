@@ -66,6 +66,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
 //    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
 
+    // Create the hRhythm QComboBox and populate
+    ui->hRhythm->addItem("NORMAL");
+    ui->hRhythm->addItem("VF");
+    ui->hRhythm->addItem("VT");
+
     // Create the selfTestStatus QComboBox
     ui->selfTestStatus->addItem("PASS");
     ui->selfTestStatus->addItem("FAIL");
@@ -74,12 +79,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     connect(ui->selfTestStatus, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &MainWindow::updateStatusIndicator);
 
-
-//    setStepBackgroundColor(ui->shockInd, Qt::red);
     //------- Electrodes ---------
     // Create an instance of Electrodes as a member variable
     electrodesWidget = new Electrodes(ui->electrodeFrame);
-    setStepBackgroundColor(ui->shockInd, Qt::red);
+//    setStepBackgroundColor(ui->shockInd, Qt::red);
 
 
     //------- Electrodes ---------
@@ -198,7 +201,7 @@ void MainWindow::selfTestComplete() {
         ui->statInd->setPixmap(statIndImage.scaled(135, 135, Qt::KeepAspectRatio));
         ui->voiceOutput->setText("Automated Defibrillator OK");
 
-        // Move to the next step after the current step's duration (e.g., 5 seconds)
+        // Move to the next step after the current step's duration (5 seconds)
         QTimer::singleShot(5000, this, &MainWindow::nextStep);
 //        nextStep();
     } else {
@@ -223,7 +226,7 @@ void MainWindow::powerButtonClicked() {
         AEDTimer.start();
 
         // Update the timer every second
-        updateTimer->start(1000);  // Update every second
+        updateTimer->start(1000);  // Update every second (adjust as needed)
 
         // Add a 3-second delay before calling the runSelfTest function
         QTimer::singleShot(3000, this, &MainWindow::runSelfTest);
@@ -234,7 +237,7 @@ void MainWindow::powerButtonClicked() {
 
 void MainWindow::startFlash(QLabel *label) {
     // Start the flashing timer for the given label
-     // Disconnect any previous connections
+    // Disconnect any previous connections
     flashTimer->disconnect();
     connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
     flashTimer->start(800);  // Adjust the interval (e.g., 800 ms) as needed
@@ -305,20 +308,28 @@ void MainWindow::performAEDStep() {
                }
         break;
 
-    case 4:
+    case 4: {
         // Step 4: Don't touch the patient
         ui->voiceOutput->append("Don't touch the patient");
+        ui->voiceOutput->append("Analyzing");
 
         // Stop the flash for step 1 and start the flash for step 2
         stopFlash(ui->step3);
         startFlash(ui->step4);
+
+
+        // Create a timer for a 6-second delay
+        QTimer::singleShot(6000, this, [this]() {
+            // Check selected rhythm
+            QString selectedRhythm = ui->hRhythm->currentText();
+            ui->heartRhythm->setText(selectedRhythm);
+
+            ui->graph->setVisible(true);
+        });
         break;
-
-
-    // ... (update for other steps)
-
+    }
     default:
-        // Handle unexpected step value
+
         break;
     }
 }
