@@ -1,4 +1,3 @@
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QIcon>
@@ -11,19 +10,23 @@ QTimer *flashTimer;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainWindow) {
 
     ui->setupUi(this);
+//    ui->battery->setVisible(false);
+    ui->batterySlot->raise();
+
     this->setWindowTitle("AED Plus");
     powerStatus = 0;
     // 1 = Pass, 0 = Fail
     statusIndicator = 1;
     step = 0;
     shockCount = 0;
+    batteryLevel = 100;
 
     // Create a timer for updating the elapsed time in the QTextBrowser
     updateTimer = new QTimer(this);
     connect(updateTimer, &QTimer::timeout, this, &MainWindow::updateElapsedTime);
 
-    // Add shockcounter
-    ui->shocksCounter->setText("SHOCKS: " + QString::number(shockCount));
+    // Connect the updateBatteryLevel slot to the updateTimer timeout signal
+    connect(updateTimer, &QTimer::timeout, this, &MainWindow::updateBatteryLevel);
 
     // Turn graph off since it lays on top of LCD
     ui->graph->setVisible(false);
@@ -36,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
 
     //Used for the flashing lights
     flashTimer = new QTimer(this);
-    connect(flashTimer, &QTimer::timeout, this, [this]() { toggleFlash(ui->step1); });
-    connect(flashTimer, &QTimer::timeout, this, [this]() { toggleFlash(ui->step2); });
+    connect(flashTimer, &QTimer::timeout, this, [this]() { toggleFlash(ui->step1, Qt::yellow); });
+    connect(flashTimer, &QTimer::timeout, this, [this]() { toggleFlash(ui->step2, Qt::yellow); });
 
 
     //Initialize image on power button
@@ -48,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
 
     connect(ui->powerButton, &QPushButton::pressed, this, &MainWindow::powerButtonPressed);
     connect(ui->powerButton, &QPushButton::released, this, &MainWindow::powerButtonReleased);
+    // Connect the button's clicked signal to the powerButtonClicked slot
+    connect(ui->powerButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
 
 
 
@@ -59,11 +64,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     initializeLabelImage(ui->step5, ":/res/AEDSteps/Step5.png", 200, 150);
     initializeLabelImage(ui->shockInd, ":/res/AEDSteps/ShockInd.png", 78, 78);
     initializeLabelImage(ui->statInd, ":/res/AEDSteps/statInd0.png", 135, 135);
-//    makeLabelRound(ui->shockInd);
 
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
     ui->shockInd->setStyleSheet("QLabel { border: 2px solid black; }");
-//    ui->statInd->setStyleSheet("QLabel { border: 2px solid black; }");
 
 
     // Create the hRhythm QComboBox and populate
@@ -89,19 +92,39 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) , ui(new Ui::MainW
     // Create an instance of Electrodes as a member variable
     electrodesWidget = new Electrodes(ui->electrodeFrame);
 
-    clickedElectrodes.clear();
-    connect(ui->electrode1, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
-    connect(ui->electrode2, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
-    connect(ui->electrode3, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
-
     // Create an instance of the VoicePrompt as a member variable
     voicePromptWidget = new VoicePrompt(ui->promptFrame);
 
-    // Connect the button's clicked signal to the powerButtonClicked slot
-    connect(ui->powerButton, &QPushButton::clicked, this, &MainWindow::powerButtonClicked);
-
     connect(ui->hRhythm, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::updateGraph);
 
+}
+
+void MainWindow::updateBatteryLevel() {
+    // If battery is lower than 15%
+    if (batteryLevel <= 15) {
+        // Display warning if battery falls below 15%
+        ui->battery->setStyleSheet("QProgressBar::chunk { background-color: red }");
+
+        if(batteryLevel <= 0){
+            ui->graph->setVisible(false);
+            ui->LCDScreen->setText("Device is shutting down");
+
+            // Schedule closing the program after 5 seconds
+            QTimer::singleShot(5000, this, &MainWindow::close);
+        }
+    }
+
+    // Update the QProgressBar
+    ui->battery->setValue(batteryLevel);
+}
+
+
+void MainWindow::shockDrain() {
+    // Decrease battery level by 1%
+    batteryLevel -= 1;
+
+    // Ensure the battery level doesn't go below 0
+    batteryLevel = qMax(batteryLevel, 0);
 }
 
 void MainWindow::updateGraph(int index) {
@@ -176,6 +199,32 @@ void MainWindow::initializePowerButtonImage(QPushButton *button, const QString &
     button->setIconSize(QSize(iconWidth, iconHeight));
 }
 
+void MainWindow::powerButtonClicked() {
+    if (powerStatus == 0) {
+        // Add shockcounter
+        ui->shocksCounter->setText("SHOCKS: " + QString::number(shockCount));
+        ui->powerButton->setStyleSheet("background-color: green");
+        ui->LCDScreen->setText("AED is powering on...");
+        powerStatus = 1;
+
+        //Show battery
+        ui->batterySlot->lower();
+
+        // Restart if the device was rebooted.
+        AEDTimer.restart();
+        // Initialize the device timer
+        AEDTimer.start();
+
+        // Update the timer every second
+        updateTimer->start(1000);  // Update every second (adjust as needed)
+
+        // Add a 3-second delay before calling the runSelfTest function
+        QTimer::singleShot(3000, this, &MainWindow::runSelfTest);
+    } else {
+        ui->LCDScreen->append("AED is already on...");
+    }
+}
+
 //Restart functions
 void MainWindow::powerButtonPressed() {
     powerButtonPressDuration = 0;
@@ -235,32 +284,13 @@ void MainWindow::selfTestComplete() {
     }
 }
 
-void MainWindow::powerButtonClicked() {
-    if (powerStatus == 0) {
-        ui->powerButton->setStyleSheet("background-color: green");
-        ui->LCDScreen->setText("AED is powering on...");
-        powerStatus = 1;
-
-        // Restart if the device was rebooted.
-        AEDTimer.restart();
-        // Initialize the device timer
-        AEDTimer.start();
-
-        // Update the timer every second
-        updateTimer->start(1000);  // Update every second (adjust as needed)
-
-        // Add a 3-second delay before calling the runSelfTest function
-        QTimer::singleShot(3000, this, &MainWindow::runSelfTest);
-    } else {
-        ui->LCDScreen->append("AED is already on...");
-    }
-}
-
-void MainWindow::startFlash(QLabel *label) {
+void MainWindow::startFlash(QLabel *label, const QColor &flashColor) {
     // Start the flashing timer for the given label
     // Disconnect any previous connections
     flashTimer->disconnect();
-    connect(flashTimer, &QTimer::timeout, this, [this, label]() { toggleFlash(label); });
+    connect(flashTimer, &QTimer::timeout, this, [this, label, flashColor]() {
+        toggleFlash(label, flashColor);
+    });
     flashTimer->start(800);  // Adjust the interval (800 ms) as needed
 }
 
@@ -270,23 +300,22 @@ void MainWindow::stopFlash(QLabel *label) {
     flashTimer->stop();
 
     QPalette palette = label->palette();
-    palette.setColor(QPalette::Window, Qt::white);
+    palette.setColor(QPalette::Window, QColor(150, 150, 150));
     label->setAutoFillBackground(true);
     label->setPalette(palette);
 }
 
-void MainWindow::toggleFlash(QLabel *label) {
-    // Toggle the background color between yellow and the original color
+void MainWindow::toggleFlash(QLabel *label, const QColor &flashColor) {
+    // Toggle the background color between the flash color and the original color
     QPalette palette = label->palette();
-    if (palette.color(QPalette::Window) == Qt::yellow) {
+    if (palette.color(QPalette::Window) == flashColor) {
         palette.setColor(QPalette::Window, QColor(150, 150, 150));
     } else {
-        palette.setColor(QPalette::Window, Qt::yellow);
+        palette.setColor(QPalette::Window, flashColor);
     }
     label->setAutoFillBackground(true);
     label->setPalette(palette);
 }
-
 
 void MainWindow::performAEDStep() {
     switch (step) {
@@ -296,12 +325,12 @@ void MainWindow::performAEDStep() {
         ui->voiceOutput->append("Check responsiveness");
 
         // Start the flash for step 1
-        startFlash(ui->step1);
+        startFlash(ui->step1, Qt::yellow);
 
 //        // Wait for 10 seconds before moving to the next step
 //        QTimer::singleShot(10000, this, &MainWindow::nextStep);
         //Test
-        QTimer::singleShot(1000, this, &MainWindow::nextStep);
+        QTimer::singleShot(10000, this, &MainWindow::nextStep);
         break;
 
     case 2:
@@ -310,27 +339,34 @@ void MainWindow::performAEDStep() {
 
         // Stop the flash for step 1 and start the flash for step 2
         stopFlash(ui->step1);
-        startFlash(ui->step2);
+        startFlash(ui->step2, Qt::yellow);
 
 //        // Wait for 10 seconds before moving to the next step
 //        QTimer::singleShot(10000, this, &MainWindow::nextStep);
 
         //Test
-        QTimer::singleShot(1000, this, &MainWindow::nextStep);
+        QTimer::singleShot(10000, this, &MainWindow::nextStep);
         break;
 
     case 3:
         // Step 3: Attach pads on the victim's chest
         ui->voiceOutput->append("Attach defib pads to patient's bare chest");
 
+        connect(ui->electrode1, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+        connect(ui->electrode2, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+        connect(ui->electrode3, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+
         // Stop the flash for step 1 and start the flash for step 2
         stopFlash(ui->step2);
-        startFlash(ui->step3);
+        startFlash(ui->step3, Qt::yellow);
         if (clickedElectrodes.size() == 3) {
-                    // All electrodes are placed, move to the next step
-                    nextStep();
+            // disconnect electrodes (from the code only), since they are no longer needed.
+            disconnect(ui->electrode1, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+            disconnect(ui->electrode2, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+            disconnect(ui->electrode3, &QPushButton::clicked, this, &MainWindow::electrodeClicked);
+            nextStep();
         } else {
-                   // Not all electrodes are placed, you can handle this case accordingly
+            // Not all electrodes are placed
                }
         break;
 
@@ -339,9 +375,9 @@ void MainWindow::performAEDStep() {
         ui->voiceOutput->append("Don't touch the patient");
         ui->voiceOutput->append("Analyzing");
 
-        // Stop the flash for step 1 and start the flash for step 2
+        // Stop the flash for step 3 and start the flash for step 4
         stopFlash(ui->step3);
-        startFlash(ui->step4);
+        startFlash(ui->step4, Qt::yellow);
 
 
         // Create a timer for a 6-second delay
@@ -356,8 +392,85 @@ void MainWindow::performAEDStep() {
             ui->graph->setVisible(true);
 
         });
+        QTimer::singleShot(8000, this, [this]() {
+            if (ui->hRhythm->currentText() == "NORMAL") {
+                ui->voiceOutput->append("No shock advised");
+                }
+            QTimer::singleShot(1000, this, &MainWindow::nextStep);
+        });
+
         break;
     }
+
+    case 5:
+        // If normal heart rhythm detected, jump to case 6
+        if (ui->hRhythm->currentText() == "NORMAL") {
+            nextStep();  // Jump to case 6
+            }
+        else {
+            // Step 5: Shock phase
+            ui->voiceOutput->append("STAND CLEAR");
+            ui->voiceOutput->append("DO NOT touch the patient");
+
+            // Stop the flash for step 1 and start the flash for step 2
+            stopFlash(ui->step4);
+            startFlash(ui->shockInd, Qt::red);
+
+            QTimer::singleShot(3000, this, [this]() {
+                // Schedule shock delivery messages with a 1-second delay
+                QTimer::singleShot(1500, this, [this]() {
+                    ui->voiceOutput->append("Shock will be delivered in 3");
+                });
+                QTimer::singleShot(2500, this, [this]() {
+                    ui->voiceOutput->append("2");
+                });
+                QTimer::singleShot(3500, this, [this]() {
+                    ui->voiceOutput->append("1");
+                });
+                QTimer::singleShot(4500, this, [this]() {
+                    ui->voiceOutput->append("BEEP!");
+                });
+                QTimer::singleShot(5500, this, [this]() {
+                    // Introduce a random chance for the heart rhythm to turn into normal
+                    int randomChance = QRandomGenerator::global()->bounded(1, 5); // Generates a random number between 1 and 4
+                    if (randomChance == 1) {
+                        ui->voiceOutput->append("Shock delivered");
+                        shockCount++;
+                        ui->shocksCounter->setText("SHOCKS: " + QString::number(shockCount));
+                        ui->hRhythm->setCurrentIndex(0);
+                        // Also set the text to Normal
+                        ui->hRhythm->setItemText(ui->hRhythm->currentIndex(), "NORMAL");
+                    } else {
+                        ui->voiceOutput->append("Shock delivered");
+                        shockCount++;
+                        ui->shocksCounter->setText("SHOCKS: " + QString::number(shockCount));
+                    }
+                    shockDrain();
+                    updateBatteryLevel();
+                });
+
+                QTimer::singleShot(9000, this, &MainWindow::nextStep);
+            });
+        }
+        break;
+
+    case 6:
+
+        //Step 6: CPR
+        // Stop the flash for step 1 and start the flash for step 2
+        stopFlash(ui->shockInd);
+        stopFlash(ui->step4);
+        startFlash(ui->step5, Qt::yellow);
+
+        // Print "complete" in voiceOutput
+            ui->voiceOutput->append("Start CPR");
+
+            // Go back to case 4 after 2 minutes of CPR
+            QTimer::singleShot(120000, this, [this]() {
+                step = 4;
+                performAEDStep();
+            });
+        break;
     default:
         // Handle unexpected step value
         break;
@@ -375,6 +488,8 @@ QLabel *MainWindow::getStepLabel(int step) {
         case 4:
             return ui->step4;
         case 5:
+            return ui->shockInd;
+        case 6:
             return ui->step5;
         default:
             return nullptr; // Handle unexpected step value

@@ -71,6 +71,7 @@ private:
         QVector<QPointF> points;
         QRandomGenerator random(QRandomGenerator::securelySeeded());
         for (int x = 0; x <= 240; x += 5) {
+            // y = amplitude * (sin(frequency) + random noise)
             double y = 100 + 15 * std::sin(0.8 * x)  + random.bounded(-4, 6);
             points.append(QPointF(x, y));
         }
@@ -83,6 +84,7 @@ private:
         QRandomGenerator random(QRandomGenerator::securelySeeded());
 
         for (double x = 0; x <= 240; x += 1) {
+            // y = amplitude * (sin(frequency))
             double y = 100 + random.bounded(20, 25) * std::sin(0.2 * x);
             points.append(QPointF(x, y));
         }
@@ -93,11 +95,13 @@ private:
     int step;
     int powerStatus;
     int shockCount;
+    int batteryLevel;
 
     //Restart mechanism
     QTimer *powerButtonTimer;
     int powerButtonPressDuration;
 
+    // Check if electrodes clicked
     QSet<QPushButton*> clickedElectrodes;
 
     QElapsedTimer AEDTimer;
@@ -109,8 +113,8 @@ private:
     Electrodes *electrodesWidget;
     VoicePrompt *voicePromptWidget;
 
-    void toggleFlash(QLabel *label);
-    void startFlash(QLabel *label);
+    void toggleFlash(QLabel *label,const QColor &flashColor);
+    void startFlash(QLabel *label, const QColor &flashColor);
     void stopFlash(QLabel *label);
     void stopCurrentStep();
     QLabel* getStepLabel(int step);
@@ -136,6 +140,9 @@ private:
     void performAEDStep();
     void nextStep();
     void previousStep();
+
+    void updateBatteryLevel();
+    void shockDrain();
 
     void updateGraph(int index);
 };
